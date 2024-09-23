@@ -4,144 +4,137 @@ date: '2024-03-04'
 lastmod: '2024-03-04'
 tags: ['rpc', 'gRPC']
 draft: false
-summary: 'RPC와 gRPC에 대해 알아봅니다 😀'
+summary: 'Let’s explore RPC and gRPC 😀'
 images: ['/static/images/thumbnail/grpc.png']
 canonicalUrl: 'https://min71.dev/posts/rpc-grpc/'
 ---
 
 ## Remote Procedure Call (RPC)
 
-RPC는 분산 컴퓨팅에서 자주 언급되는 소프트웨어 통신 프로토콜로, 프로그램이 다른 디바이스에서 실행되는 서브루틴 절차를 발생시킬 수 있도록 하여 프로세스 간의 통신을 실션시키는 특징을 갖고 있습니다
+RPC is a software communication protocol commonly mentioned in distributed computing, allowing programs to invoke subroutines that run on other devices, thus enabling communication between processes.
 
-RPC는 원격 서비스 호출을 추상화하는 기법이며, HTTP/2는 이러한 호출이 이루어지는 방식을 최적화하는 전송 프로토콜 중 하나입니다.
+RPC abstracts remote service calls, and HTTP/2 is one of the transport protocols that optimizes the way these calls occur. By using HTTP/2 in frameworks like gRPC, RPC calls can be made faster and more efficiently.
 
-gRPC와 같은 RPC 프레임워크가 HTTP/2를 사용함으로써, RPC 호출은 더 빠르고 효율적으로 이루어질 수 있습니다.
+With RPC, developers can write code as if the subroutines were local. Using RPC means that, regardless of whether the calls are local or remote, the procedure itself remains fundamentally the same.
 
-RPC를 사용하면 개발자들은 서브루틴이 로컬인 것처럼 코드를 작성할 수 있으며, RPC를 사용한다는 것은 로컬 또는 원격 호출과 관계없이 모든 호출 절차와는 관계없이 기본적으로 동일하다는 것을 의미한다고 합니다.
-
-> 💡 _RPC는 원격 요청-응답 프로토콜을 구현하므로 네트워크 문제가 발생할 경우 원격 프로시저 호출이 실패할 수 있습니다!_
+> 💡 _Since RPC implements a remote request-response protocol, network issues can cause remote procedure calls to fail!_
 
 ### HTTP/2
 
-RPC와 HTTP/2는 서로 다른 계층의 기술이지만, RPC 프레임워크가 HTTP/2를 사용함으로써 서로 보완하여 더 빠르고 효율적인 원격 통신을 가능하게 합니다.
+Although RPC and HTTP/2 belong to different layers, RPC frameworks benefit from using HTTP/2 to enable faster and more efficient remote communication.
 
-HTTP/2는 HTTP 프로토콜의 두 번 째 버전으로 HTTP/1의 다음과 같은 한계점을 개선하기 위해 설계되었습니다.
+HTTP/2, the second version of the HTTP protocol, was designed to overcome the following limitations of HTTP/1:
 
-**HTTP/1 의 한계**
+**Limitations of HTTP/1**
 
-- HTTP/1 연결은 한 번에 하나의 요청과 응답만 처리할 수 있으며 다수의 리소스를 요청하려면 여러 TCP연결이 필요합니다. 이는 오버헤드를 증가시키고 성능을 저하시킵니다.
-- 한 연결에서 첫 번째 요청이 지연되면 후속 요청도 지연되므로 웹 페이지 로딩 시간에 부정적인 영향을 줄 수 있습니다.
-- HTTP/1에서는 매 요청마다 헤더가 반복 전송되며 많은 경우 이 헤더들은 중복되거나 불필요한 정보를 포함하고 있어 대역폭을 낭비합니다.
+- An HTTP/1 connection can only handle one request and response at a time, requiring multiple TCP connections to request multiple resources. This increases overhead and reduces performance.
+- When the first request on a connection is delayed, subsequent requests are also delayed, negatively affecting web page load times.
+- In HTTP/1, headers are retransmitted with every request, often containing duplicate or unnecessary information, which wastes bandwidth.
 
-**위의 한계점은 개선한 HTTP/2의 주요 개선 사항은 다음과 같습니다.**
+**Key improvements in HTTP/2 that address these limitations include:**
 
-- 이진 프로토콜 사용을 사용하여 전송 효율성을 개선하고 오류 발생 가능성을 줄입니다.
-- HTTP/2는 단일 TCP 연결을 통해 여러 요청과 응답을 동시에 처리할 수 있으며 이로인해 네트워크 지연을 줄이고 페이지 로드 시간을 단축시킬 수 있습니다.
-- 서버가 클라이언트에서 요청하지 않은 리소스를 미리 보낼 수 있으며 이로인해 클라이언트가 필요로 하는 리소스를 더 빠르게 받을 수 있으므로 성능을 개선합니다.
-- HTTP/2는 HPACK 압축 방식을 사용하여 헤더를 압축하므로 헤더로 인한 오버헤드를 크게 줄일 수 있습니다.
-- HTTP/2는 리소스 간의 의존성과 우선순위를 설정할 수 있어, 중요한 리소스를 먼저 로드할 수 있습니다.
+- The use of a binary protocol to improve transmission efficiency and reduce the likelihood of errors.
+- HTTP/2 can handle multiple requests and responses simultaneously over a single TCP connection, reducing network latency and improving page load times.
+- The server can send resources to the client before they are requested, improving performance by delivering resources faster.
+- HTTP/2 uses HPACK compression to reduce header overhead significantly.
+- It allows for setting dependencies and priorities between resources, ensuring that critical resources are loaded first.
 
-### RPC 구조
+### RPC Structure
 
-gRPC의 구조는 크게 애플리케이션 레벨, 프레임워크 레벨, 전송 계층으로 나눌 수 있으며, 각 계층은 특정한 역할과 책임을 가집니다. 이러한 계층 구조와 HTTP/2 기반 통신은 gRPC의 효율성과 성능을 극대화합니다.
+The structure of gRPC can be divided into three layers: the application layer, the framework layer, and the transport layer. Each layer has specific roles and responsibilities, and this layered architecture, combined with HTTP/2-based communication, maximizes gRPC’s efficiency and performance.
 ![](/static/images/grpc/grpc-structure.png)
 
-**애플리케이션 레벨**
+**Application Layer**
 
-- 서비스 정의 : 개발자는 프로토콜 버퍼(protobuf)를 사용하여 .proto 파일 내에 애플리케이션에서 사용할 서비스 인터페이스와 메시지 형식을 정의합니다. 이는 클라이언트와 서버 사이의 계약이 되며, 애플리케이션 로직을 구현하는 데 필요한 기반을 제공합니다.
+- Service Definition: Developers use Protocol Buffers (protobuf) to define service interfaces and message formats in a .proto file, which serves as a contract between the client and server, providing the foundation for implementing application logic.
+  
+- Client and Server Implementation: Using the automatically generated client and server stubs, developers implement the service logic. Clients can call the server’s methods as if they were local, while the server handles the requests.
 
-- 클라이언트 및 서버 구현: 자동 생성된 클라이언트 스텁과 서버 스텁을 사용하여, 개발자는 서비스 로직을 구현합니다. 클라이언트는 서버의 메소드를 로컬 메소드처럼 호출할 수 있으며, 서버는 이러한 요청을 처리합니다.
+**Framework Layer**
 
-**프레임워크 레벨**
+- Serialization and Deserialization: gRPC uses protobuf to serialize and deserialize messages, ensuring efficient data transmission, and the framework handles this automatically.
 
-- 직렬화 및 역직렬화: gRPC는 프로토콜 버퍼를 사용하여 메시지를 직렬화하고 역직렬화합니다. 이는 데이터를 효율적으로 전송하기 위해 필요하며, 프레임워크가 자동으로 처리합니다.
+- Code Generation: The gRPC framework automatically generates client and server stubs based on the service definitions in the .proto file. It supports multiple programming languages, reducing language barriers.
+  
+- Authentication and Security: gRPC supports secure connections via TLS/SSL and provides authentication mechanisms like OAuth2, managed at the framework level.
 
-- 코드 생성: gRPC 프레임워크는 .proto 파일에서 정의된 서비스에 대한 클라이언트 스텁과 서버 스텁을 자동으로 생성합니다. 이는 다양한 프로그래밍 언어를 지원하여 언어 간의 장벽을 낮춥니다.
+**Transport Layer**
 
-- 인증 및 보안: gRPC는 TLS/SSL을 통한 보안 연결을 지원하며, OAuth2와 같은 인증 메커니즘을 제공합니다. 프레임워크 레벨에서 이러한 보안 기능을 관리합니다.
+- HTTP/2-Based Communication: gRPC uses HTTP/2 at the transport layer, leveraging features such as multiplexing, server push, stream prioritization, and header compression to improve communication efficiency and performance.
 
-**전송 계층**
-
-- HTTP/2 기반 통신: gRPC는 전송 계층에서 HTTP/2 프로토콜을 사용합니다. HTTP/2의 주요 특징인 멀티플렉싱, 서버 푸시, 스트림 우선순위, 헤더 압축 등을 활용하여, 통신의 효율성과 성능을 향상시킵니다.
-
-- 양방향 스트리밍: HTTP/2의 스트리밍 기능을 통해, gRPC는 서버와 클라이언트 간의 양방향 스트리밍 통신을 지원합니다. 이는 실시간 데이터 전송과 같은 시나리오에서 유용합니다.
+- Bidirectional Streaming: With HTTP/2’s streaming capabilities, gRPC supports bidirectional streaming between the client and server, which is useful in scenarios like real-time data transmission.
 
 ### Stub
 
-스텁은 RPC의 핵심 개념으로 매개변수 객체를 Message로 Mashalling(변환) / Unmarshalling(역 변환)하는 레이어로 클라이언트의 스텁과 서버의 스텁으로 나눠집니다.
+The stub is a core concept of RPC, acting as a layer that marshals (transforms) and unmarshals (reverses) parameter objects into messages. It is divided into the client stub and server stub.
 ![](/static/images/grpc/rpc-stub.png)
 
 ### ProtoBuf
 
-Protobuf(Protocol Buffers)는 Google에서 개발한 오픈 소스 교차 플랫폼 데이터 형식이며, 구조화된 데이터를 직렬화하고 네트워크 또는 데이터 저장 시 프로그램 통신을 지원하며,
-Interchain 스택에서 Protobuf는 개발자가 메시지 형식을 설명하는 데 사용하는 데이터 직렬화 방법입니다.
+Protobuf (Protocol Buffers) is an open-source, cross-platform data format developed by Google. It helps serialize structured data and supports program communication over networks or data storage. In the Interchain stack, Protobuf is used by developers as a data serialization method for defining message formats.
 
-> ✏️ _**Cosmos SDK v0.40에서부터 체인 상태 및 트랜잭션의 데이터 인코딩 형식을 기존의 Amino에서 더 좋은 인코딩/디코딩 성능이 나오는 Protobuf로 대체하기 시작**했으며 Protobuf가 gRPC 기능을 자동으로 정의하고 생성하므로 gRPC 사용이 촉진된다는 장점도 기여했다고 합니다._
+> ✏️ _**From Cosmos SDK v0.40 onwards, the encoding format for chain state and transaction data has been replaced from Amino to Protobuf, which offers better encoding/decoding performance. The automatic generation and definition of gRPC functionality by Protobuf also helped promote the use of gRPC.**_
 
-### gRPC 채널
+### gRPC Channel
 
-gRPC는 여러 서브채널을 열어서 통신합니다. 이러한 채널을 재사용함으로써 통신비용을 절약 가능합니다.
+gRPC opens multiple subchannels for communication. Reusing these channels helps reduce communication costs.
 ![](/static/images/grpc/grpc-channel.png)
 
-### RPC 작동 원리
+### How RPC Works
 
-일반적으로 원격 프로시저 호출이 호출되면 프로시저 매개변수가 네트워크를 통해 프로시저가 실행되는 실행 환경으로 전송됩니다.
-완료되면 호출된 프로시저 호출의 결과가 호출 환경으로 전송되며,
-그 후 다음 일반 로컬 프로시저 호출에서와 마찬가지로 호출 환경에서 실행이 다시 시작됩니다.
+Typically, when a remote procedure call is invoked, the procedure parameters are sent over the network to the execution environment where the procedure is executed. Once completed, the result of the called procedure is sent back to the calling environment, and the execution resumes in the calling environment, just like a regular local procedure call.
 ![](/static/images/grpc/rpc.png)
-단계별 RPC 요청은 아래와 같습니다.
 
-> **1. 클라이언트는 RPC 중에 클라이언트와 서버 간에 전달되는 매개 변수를 변환하는 코드 조각인 클라이언트 Stub을 호출합니다.**
->
-> ⤷ _원격 시스템의 프로그램이 로컬에서 작동하는 것 처럼 동작할 수 있도록 도와주는 작은 프로그램 루틴을 `Stub`이라고 하며,
-> 클라이언트와 서버 사이에서 인터페이스를 통일 및 해당 메소드 호출을 추상화하는 역할을 하므로 클라이언트는 네트워크 프로토콜, 직렬화, 역질렬화 등의 세부사항에 신경 쓰지 않고도 원격 메소드를 호출할 수 있게 도와줍니다._
->
-> **2. 클라이언트 Stub은 프로시저 매개변수를 메시지에 패킹합니다.**
->
-> ⤷ _원격 서버에서 처리할 수 있는 형태로 데이터를 변환하거나 패키징하는 과정을 `Marshaling`이라고 하며, 마샬링된 데이터는 네트워크를 통해 전송될 수 있도록 바이트 스트림 등의 형태로 직렬화 되어 변환합니다._
->
-> **3. 그런 다음 클라이언트 Stub은 시스템 호출을 만들어 메시지를 보냅니다.**
->
-> **4. 클라이언트의 로컬 운영 체제(OS)는 해당 전송 계층을 통해 클라이언트에서 서버로 메시지를 보냅니다.**
->
-> **5. 서버 OS는 수신 패킷을 서버 스텁으로 전달합니다.**
->
-> **6. 서버 스텁은 메시지와 함께 포함된 프로시저 매개변수를 압축 해제합니다. 이를 UnMarshaling이라고 합니다.**
->
-> **7. 서버 Stub이 서버 프로시저를 호출하고 프로시저가 실행됩니다.**
->
-> **8. 절차가 완료되면 출력이 서버 Stub으로 반환되며, 반환값을 메세지에 페킹합니다.**
->
-> **9. 메시지는 클라이언트의 전송 계층을 통해서 메시지를 전송합니다.**
->
-> **10. 클라이언트 스텁은 반환 매개 변수를 해제하고 원래 호출 클라이언트로 반환합니다.**
+The steps of an RPC request are as follows:
 
-### 장점
+> **1. The client calls the client stub, which is a piece of code that transforms the parameters passed between the client and the server during RPC.**
+>
+> ⤷ _A small program routine that allows a remote system’s program to operate as if it were local is called a `Stub`. It unifies the interface and abstracts the method call between the client and the server, allowing the client to call remote methods without worrying about network protocols, serialization, or deserialization details._
+>
+> **2. The client stub packs the procedure parameters into a message.**
+>
+> ⤷ _The process of converting or packaging data into a form that can be processed by the remote server is called `Marshaling`. Marshaled data is serialized into a byte stream for transmission over the network._
+>
+> **3. The client stub makes a system call to send the message.**
+>
+> **4. The client’s local operating system (OS) sends the message from the client to the server through the transport layer.**
+>
+> **5. The server OS passes the received packet to the server stub.**
+>
+> **6. The server stub unpacks the procedure parameters included with the message, a process called UnMarshaling.**
+>
+> **7. The server stub calls the server procedure, and the procedure is executed.**
+>
+> **8. Once the procedure is completed, the output is returned to the server stub, which packs the return value into a message.**
+>
+> **9. The message is transmitted through the transport layer to the client stub.**
+>
+> **10. The client stub unmarshals the return parameters and returns them to the original calling client.**
+
+### Advantages
 
 **1. MSA**
-gRPC는 대부분 아키텍쳐에서도 사용 가능하지만 Micro Service Architecture(MSA)에 가장 적합한 기술로 많은 서비스 간의 API 호출로 인한 성능 저하를 개선하며 보안, API 게이트웨이, 로깅 등을 개발하기 좋습니다.
+gRPC is suitable for most architectures, but it is particularly well-suited for Microservice Architecture (MSA). It improves performance by mitigating API call overhead between services, and facilitates security, API gateway, logging, etc.
 
-**2. 높은 생산성**
-프로토콜 버퍼의 IDL을 정의하면 서비스와 메시지에 대한 소스코드가 자동으로 생성되고 데이터를 주고 받을 수 있습니다.
+**2. High Productivity**
+Once the IDL of Protocol Buffers is defined, source code for services and messages is automatically generated, enabling easy data exchange.
 
-**3. 속도 및 효율성**
-HTTP/2 기반 통신으로 클라이언트와 서버간 양방향 스트리밍이 가능하며, 프로토콜 버퍼를 사용해 직렬화된 바이트 스트림으로 통신하기 때문에 JSON 기반의 통신보다 더 가볍고 빠릅니다.
+**3. Speed and Efficiency**
+gRPC supports bidirectional streaming between the client and server with HTTP/2-based communication. Using Protocol Buffers for serialized byte-stream communication makes it lighter and faster than JSON-based communication.
 
-**4. 언어 중립적**
-다양한 프로그래밍 언어를 지원하여 여러 언어로 작성된 시스템간의 통신을 용이하게 합니다.
+**4. Language Neutrality**
+gRPC supports various programming languages, making it easier for systems written in different languages to communicate.
 
-### 단점
+### Disadvantages
 
-**1. 브라우저 지원 제한**
-gRPC는 HTTP/2를 사용하지만 웹 브라우저에서 직접 사용하는데는 제한적입니다.
-그러나 gRPC-Web을 통해 일부 해결이 가능합니다
+**1. Limited Browser Support**
+While gRPC uses HTTP/2, it is limited in terms of direct use in web browsers. However, gRPC-Web provides a partial solution.
 
-**2. 오버헤드**
-프로토콜 버퍼가 효율적인 직렬화 방식이지만 작은 데이터를 위한 간단한 JSON API에 비해 상대적으로 더 많은 오버헤드가 있을 수 있습니다.
+**2. Overhead**
+Though Protocol Buffers is an efficient serialization method, it may have more overhead than a simple JSON API for small data.
 
 ---
 
 ### Reference
 
-- [큰돌 블로그](https://blog.naver.com/jhc9639/222642712063)
-- [GRPC Document](https://grpc.io/docs/)
+- [GRPC Documentation](https://grpc.io/docs/)

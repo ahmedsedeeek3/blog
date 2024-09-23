@@ -1,0 +1,90 @@
+---
+title: 'QUIC Protocol'
+date: '2024-09-23'
+lastmod: '2024-09-23'
+tags: ['QUIC', 'Protocol', 'HTTP/3']
+draft: false
+summary: 'Let’s explore the QUIC protocol, a modern transport protocol designed for the web 🌍'
+images: ['/static/images/quic.png']
+canonicalUrl: 'https://yourwebsite.dev/posts/quic-protocol/'
+---
+
+## QUIC Protocol
+
+QUIC (Quick UDP Internet Connections) is a transport protocol developed by Google that is designed to make internet connections faster, more secure, and more reliable. Unlike traditional TCP, QUIC is based on UDP and offers several improvements that make it particularly suited for HTTP/3 traffic.
+
+QUIC was developed to address some of the limitations of TCP, such as head-of-line blocking and slow connection setups. It integrates transport and security functions, combining the reliability of TCP with the flexibility and speed of UDP, while leveraging encryption similar to TLS/SSL.
+
+> 💡 _QUIC improves network performance, particularly over unreliable networks, by using connection migration, multiplexing, and built-in encryption._
+
+---
+
+## Key Features of QUIC
+
+### 1. Multiplexing Without Head-of-Line Blocking
+
+One of the key benefits of QUIC over TCP is the elimination of **head-of-line (HOL) blocking**. In TCP, if a single packet is lost, subsequent packets have to wait until the missing packet is retransmitted and processed. QUIC uses multiplexed streams over a single connection to avoid this issue. Each stream is delivered independently, so packet loss on one stream doesn’t affect others.
+
+### 2. Connection Migration
+
+QUIC supports **connection migration**, allowing clients to maintain the same connection even when the underlying network changes. For example, if a user moves from Wi-Fi to mobile data, the QUIC connection continues without interruption, reducing the need for reconnections.
+
+### 3. Faster Handshakes
+
+QUIC has faster connection setup times compared to TCP+TLS. With TCP, you need a **three-way handshake** to establish a connection and an additional handshake for TLS. QUIC combines these steps, allowing connections to be established with fewer round-trip times (RTTs). This reduces latency, especially in high-latency networks.
+
+### 4. Built-in Security
+
+QUIC integrates **TLS 1.3** directly into the protocol, providing encryption by default. Since encryption is mandatory, QUIC is inherently more secure than TCP, which can operate without encryption. This also simplifies the security model, as all QUIC connections are protected by modern cryptographic standards.
+
+### 5. Reduced Latency
+
+QUIC is designed to minimize latency by reducing the number of round-trips needed to establish a connection and by using techniques like 0-RTT resumption for faster reconnections. This makes QUIC ideal for applications that require low-latency connections, such as streaming services, online gaming, and real-time communications.
+
+---
+
+## HTTP/3 and QUIC
+
+QUIC serves as the transport layer for **HTTP/3**, the latest version of the HTTP protocol. HTTP/3 uses QUIC instead of TCP as its transport protocol, providing significant improvements in speed and performance, particularly in high-latency environments.
+
+### Improvements Over HTTP/2
+
+HTTP/2 uses multiplexing over a single TCP connection, but still suffers from head-of-line blocking at the TCP layer. QUIC, on the other hand, eliminates head-of-line blocking by implementing multiplexing directly in the transport layer, meaning HTTP/3 can perform better in real-world conditions where packet loss occurs.
+
+**HTTP/2 vs HTTP/3 with QUIC**
+
+| Feature                 | HTTP/2 (TCP)              | HTTP/3 (QUIC)               |
+|-------------------------|---------------------------|-----------------------------|
+| Transport Protocol       | TCP                       | QUIC (UDP)                   |
+| Head-of-Line Blocking    | Yes (TCP level)           | No (Stream-level multiplexing)|
+| Connection Establishment | Slow (Multiple RTTs)      | Fast (1-RTT or 0-RTT)        |
+| Encryption               | Optional (TLS)            | Mandatory (TLS 1.3)          |
+| Connection Migration     | No                        | Yes                          |
+
+---
+
+## How QUIC Works
+
+### 1. Connection Establishment
+
+Unlike TCP, which requires multiple round trips to establish a secure connection, QUIC reduces this overhead. On the first connection, QUIC performs a TLS 1.3 handshake as part of its connection setup, requiring only 1-RTT (or 0-RTT for session resumption).
+
+### 2. Multiplexed Streams
+
+QUIC allows multiple streams within a single connection, where each stream operates independently. This prevents HOL blocking, where the loss of a packet would otherwise delay the delivery of subsequent packets.
+
+### 3. Flow Control and Congestion Control
+
+Similar to TCP, QUIC implements **flow control** and **congestion control** mechanisms to manage network traffic effectively. However, QUIC can adapt more dynamically because it runs over UDP, allowing more flexibility in how these mechanisms are handled.
+
+### 4. Packet Loss Recovery
+
+QUIC uses sophisticated mechanisms for **packet loss recovery** that are not reliant on TCP’s traditional retransmission mechanisms. QUIC can detect and recover from packet loss more quickly, improving performance, especially on unreliable networks.
+
+---
+
+## Advantages of QUIC
+
+**1. Speed**
+
+QUIC offers faster connection times due to its reduced handshake overhead and support for 0-RTT resumption. This makes it especially useful for real-time applications and websites where speed is
