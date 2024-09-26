@@ -19,8 +19,8 @@ export function TypedIntroduceWrapper() {
     const options = {
       strings: [
         'Hello, Here is my personal blog! 📝',
-        `I've been working as a Web developer for 2 years 💻`,
-        'I am interested in blockchain network and web3.0 🔗',
+        `I've been working as a Back End Developer for 7 years 💻`,
+        'I am interested in distributed system  and high performance apps 🔗',
         'I am interested in Web Service and Web Application 🌐',
       ],
       typeSpeed: 50,

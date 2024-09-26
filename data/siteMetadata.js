@@ -2,12 +2,12 @@
 const siteMetadata = {
   title: 'Ahmed Dev Blog',
   author: 'Ahmed Sedik',
-  headerTitle: 'Sedik Dev Blog',
+  headerTitle: 'Sedik-Blog',
   description: 'Step by step, but Steadily and Consistently 📝',
   language: 'en-us',
   theme: 'system', // system, dark or light
   siteUrl: 'https://ahmedsededik.',
-  siteRepo: 'https://github.com/mingi3442/blog',
+  siteRepo: 'https://github.com/',
   siteLogo: '/static/images/favicon.png',
   socialBanner: '/static/images/banner.jpeg',
   // mastodon: 'https://mastodon.social/@mastodonuser',
